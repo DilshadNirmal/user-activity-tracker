@@ -25,8 +25,8 @@ mongoose
 // Routes
 app.use("/api/users", userRoutes);
 
-app.get("/", () => {
-  return express.json({ message: "app is running" });
+app.get("/", (req, res) => {
+  res.send("hello world");
 });
 
 const PORT = process.env.PORT || 5000;
