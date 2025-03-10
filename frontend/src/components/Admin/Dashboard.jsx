@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import api from "../../config/axios";
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
@@ -16,12 +16,7 @@ const AdminDashboard = () => {
           return;
         }
 
-        const response = await axios.get(
-          "http://localhost:5000/api/users/activities",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await api.get("/api/users/activities");
         setUsers(response.data);
       } catch (error) {
         setError("Failed to fetch user activities");
@@ -36,14 +31,7 @@ const AdminDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/users/logout",
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+      await api.post("/api/users/logout");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       navigate("/login");

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../../config/axios";
 
 const UserDashboard = () => {
   const navigate = useNavigate();
@@ -8,16 +8,7 @@ const UserDashboard = () => {
 
   const handleLogout = async () => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.post(
-        "http://localhost:5000/api/users/logout",
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      await api.post("/api/users/logout");
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       navigate("/login");
