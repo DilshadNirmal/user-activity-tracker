@@ -2,6 +2,26 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { getLocationFromIp } = require("../utils/geoLocation");
+const axios = require('axios');
+
+// Reverse geocoding function
+const reverseGeocode = async (latitude, longitude) => {
+  try {
+    const response = await axios.get(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+    );
+    
+    return {
+      city: response.data.address.city || response.data.address.town || response.data.address.village || 'Unknown',
+      country: response.data.address.country || 'Unknown',
+      latitude,
+      longitude
+    };
+  } catch (error) {
+    console.error('Reverse geocoding error:', error);
+    return null;
+  }
+};
 
 // Register new user
 const register = async (req, res) => {
@@ -27,6 +47,23 @@ const register = async (req, res) => {
     await user.save();
     res.status(201).json({ message: "User created successfully" });
   } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Reverse geocoding endpoint
+const handleReverseGeocode = async (req, res) => {
+  try {
+    const { latitude, longitude } = req.body;
+    const locationData = await reverseGeocode(latitude, longitude);
+    
+    if (!locationData) {
+      return res.status(400).json({ message: "Failed to get location data" });
+    }
+    
+    res.json(locationData);
+  } catch (error) {
+    console.error('Error in reverse geocoding endpoint:', error);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -107,4 +144,5 @@ module.exports = {
   login,
   logout,
   getUserActivities,
+  handleReverseGeocode
 };

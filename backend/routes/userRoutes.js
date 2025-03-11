@@ -5,6 +5,7 @@ const {
   login,
   logout,
   getUserActivities,
+  handleReverseGeocode
 } = require("../controllers/userController");
 const { auth, adminAuth } = require("../middleware/auth");
 
@@ -14,6 +15,7 @@ router.post("/login", login);
 
 // Protected routes
 router.post("/logout", auth, logout);
+router.post("/reverse-geocode", auth, handleReverseGeocode);
 
 // Admin routes
 router.get("/activities", adminAuth, getUserActivities);
