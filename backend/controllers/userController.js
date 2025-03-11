@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { getLocationFromIp } = require("../utils/geoLocation");
 
 // Register new user
 const register = async (req, res) => {
@@ -45,10 +46,12 @@ const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Record login activity with client IP
+    // Record login activity with client IP and location
+    const location = await getLocationFromIp(req.clientIp);
     user.activities.push({
       type: "login",
       ipAddress: req.clientIp,
+      location
     });
     await user.save();
 
@@ -74,10 +77,12 @@ const login = async (req, res) => {
 // Logout user
 const logout = async (req, res) => {
   try {
-    // Record logout activity with client IP
+    // Record logout activity with client IP and location
+    const location = await getLocationFromIp(req.clientIp);
     req.user.activities.push({
       type: "logout",
       ipAddress: req.clientIp,
+      location
     });
     await req.user.save();
 
